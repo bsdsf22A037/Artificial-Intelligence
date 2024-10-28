@@ -6,7 +6,6 @@ class Node:
         self.h_cost = h_cost
 
     def generate_children(self, goal_state):
-       
         children = []
         x, y = self.find_blank(self.state)
         moves = [('up', x - 1, y), ('down', x + 1, y), ('left', x, y - 1), ('right', x, y + 1)]
@@ -14,22 +13,20 @@ class Node:
         for move, new_x, new_y in moves:
             if 0 <= new_x < 3 and 0 <= new_y < 3:
                 new_state = [list(row) for row in self.state]
-               
                 new_state[x][y], new_state[new_x][new_y] = new_state[new_x][new_y], new_state[x][y]
                 new_state = tuple(tuple(row) for row in new_state)  
                 h_cost = self.calculate_heuristic(new_state, goal_state)
                 children.append(Node(new_state, self, move, h_cost))
+                
         return children
 
     def find_blank(self, state):
-      
         for i in range(3):
             for j in range(3):
                 if state[i][j] == 0:
                     return i, j
 
     def calculate_heuristic(self, state, goal_state):
-    
         distance = 0
         for i in range(3):
             for j in range(3):
@@ -40,11 +37,13 @@ class Node:
         return distance
 
     def find_position(self, state, num):
-  
         for i in range(3):
             for j in range(3):
                 if state[i][j] == num:
                     return i, j
+
+    def format_state(self, state):
+        return "\n".join(" ".join(str(cell) for cell in row) for row in state)  
 
 
 class GreedyBestFirstSearch:
@@ -62,7 +61,11 @@ class GreedyBestFirstSearch:
             frontier.sort(key=lambda node: node.h_cost)
             current_node = frontier.pop(0)
 
+            # Print only the selected state for the next search
+            print(f"Selected State for Next Search (\n{current_node.format_state(current_node.state)}\n")
+
             if current_node.state == self.goal_state:
+            
                 return self.trace_solution(current_node)
 
             self.visited.add(current_node.state)
@@ -73,12 +76,12 @@ class GreedyBestFirstSearch:
         return None
 
     def trace_solution(self, node):
-       
         path = []
         while node:
             path.append(node.move)
             node = node.parent
         return path[::-1]  
+
 
 start_state = (
     (1, 2, 3),
@@ -88,7 +91,7 @@ start_state = (
 
 goal_state = (
     (1, 2, 3),
-    (4, 5,8 ),
+    (4, 5, 8),
     (6, 7, 0)
 )
 
